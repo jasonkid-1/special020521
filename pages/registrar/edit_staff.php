@@ -1,0 +1,158 @@
+<?php 
+include '../../includes/session.php';
+include '../../includes/db.php'; 
+
+$id =$_GET['faculty_id'];
+ if (isset($_POST['update'])) {
+    $image = addslashes(file_get_contents($_FILES['image']['tmp_name']));
+    $faculty_no = mysqli_real_escape_string($db, $_POST['faculty_no']);
+    $lname = mysqli_real_escape_string($db, $_POST['lname']);
+    $fname = mysqli_real_escape_string($db, $_POST['fname']);
+    $mname = mysqli_real_escape_string($db, $_POST['mname']);
+    $position = mysqli_real_escape_string($db, $_POST['position']);
+    $status = mysqli_real_escape_string($db, $_POST['status']);
+    $email = mysqli_real_escape_string($db, $_POST['email']);
+    $username = mysqli_real_escape_string($db, $_POST['username']);
+    $password =mysqli_real_escape_string($db,$_POST['password']);
+    $hashedPwd = password_hash($password, PASSWORD_DEFAULT);
+
+    $updated_at = date('Y-m-d H:i:s');
+
+    $query = mysqli_query($db," UPDATE tbl_faculties_staff SET img='$image', faculty_no='$faculty_no', faculty_lastname='$lname',faculty_firstname='$fname', faculty_middlename='$mname', position='$position', status='$status', email='$email', username='$username', password='$hashedPwd',
+
+     updated_at = '$updated_at',
+      name ='".$_SESSION['name']." - ".$_SESSION['role']."' 
+      WHERE faculty_id = '$id' ")or die(mysqli_error($db));
+
+    if($query == true)
+    {
+      message("Successfully Updated!","success");
+    }else{
+      message("Something went wrong!","error");
+    }
+    
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<?php include '../../includes/head_css.php'; ?>
+
+<body class="">
+  <div class="wrapper ">
+    <?php include '../../includes/sidebar.php'; ?>
+    <div class="main-panel">
+      <!-- Navbar -->
+      <?php include '../../includes/top_nav.php'; ?>
+      <!-- End Navbar -->
+      <div class="content">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12">
+<?php check_message(); ?>
+              <div class="card">
+                <div class="card-body">
+<?php 
+$qwerty = mysqli_query($db,"SELECT * from tbl_faculties_staff  where faculty_id = '".$_GET['faculty_id']."' ");
+                                    while($row = mysqli_fetch_array($qwerty)){
+?>
+                  <form method="POST" class="form-horizontal" autocomplete="off" enctype="multipart/form-data">
+                    <div class="card-profile">
+                      <div class="card-avatar">
+                          <img class="img" src="data:image/jpeg;base64,<?php echo base64_encode( $row['img'] )?>" />
+                      </div>
+                      <div class="card-body">
+                        <input type="file" name="image" class="btn btn-raised btn-round btn-default btn-file">
+                      </div>
+                    </div>
+                  <fieldset style="border: 1px solid;padding: 0px 10px;border-color: #d2d2d2">
+                    <legend style="text-align:center">PERSONAL DATA</legend>
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="bmd-label-floating">FacultyID Number</label>
+                          <input name="faculty_no" type="text" class="form-control" value="<?php echo $row['faculty_no'] ?>">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="bmd-label-floating">Last Name</label>
+                          <input name="lname" type="text" class="form-control" value="<?php echo $row['faculty_lastname'] ?>">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="bmd-label-floating">First Name</label>
+                          <input name="fname" type="text" class="form-control" value="<?php echo $row['faculty_firstname'] ?>">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="bmd-label-floating">Middle Initial</label>
+                          <input name="mname" type="text" class="form-control" value="<?php echo $row['faculty_middlename'] ?>">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="bmd-label-floating">Email</label>
+                          <input name="email" type="email" class="form-control" value="<?php echo $row['email'] ?>">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="bmd-label-floating">Position</label>
+                          <input name="position" type="text" class="form-control" value="<?php echo $row['position'] ?>">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <select name="status" id="status" data-style="btn btn-primary btn-round" required class="form-control select-2">
+                            <option value="<?php echo $row['status'] ?>" selected><?php echo $row['status'] ?></option>
+                            <option value="Full-time">Full-time</option>
+                            <option value="Part-time">Part-time</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </fieldset>
+                    <br>
+                    <fieldset  style="border: 1px solid;padding: 0px 10px;border-color: #d2d2d2">
+                    <legend style="text-align:center">ACCOUNT DETAILS</legend>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="bmd-label-floating">Username</label>
+                          <input name="username" type="text" class="form-control" value="<?php echo $row['username'] ?>">
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="bmd-label-floating">Password</label>
+                          <input name="password" type="password" class="form-control" required>
+                        </div>
+                      </div>
+                    </div>
+                    </fieldset>
+                    <br>
+                    <button type="submit" name="update" class="btn btn-primary pull-right">Update Faculty</button>
+                    <div class="clearfix"></div>
+                  </form>
+<?php 
+  }
+?>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <?php include '../../includes/footer.php';?>
+    </div>
+  </div>
+<?php include '../../includes/script.php'; ?>
+</body>
+
+</html>
